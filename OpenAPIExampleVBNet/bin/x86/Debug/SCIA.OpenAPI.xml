@@ -1,0 +1,975 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SCIA.OpenAPI</name>
+    </assembly>
+    <members>
+        <member name="T:SCIA.OpenAPI.Environment">
+            <summary>Treats the Scia Engineer environment - starts Scia Engineer, creates <see cref="T:SCIA.OpenAPI.EsaProject"/>, creates <see cref="T:SCIA.OpenAPI.Structure"/>, treats the communication between your application and Scia Engineer</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Constructor for initialization of new Environment. This is the starting point for external applications.
+            </summary>
+            <param name="sciaEngineerSystemPath">provide string with path to Scia Engineer install directory </param>
+            <param name="appTempPath">provide string with path to desired temp location, it can be relative e.g. @".\\temp"</param>
+            /// <param name="ReqAPIversion">Provide string with version of Scia Engineer you are going to use. This version can be found in Scia Engineer application in Help>About</param>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.#ctor">
+            <summary>
+            A parameter-less constructor, that should be used in COM-based calls. It should be followed by the  <see cref="M:SCIA.OpenAPI.Environment.Init(System.String,System.String,System.String)"/> method.
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.Init(System.String,System.String,System.String)">
+            <summary>
+            A method for initialization of empty object, that is crated by the <see cref="M:SCIA.OpenAPI.Environment.#ctor"/> parameters-less constructor. This method should be called after using the parameter-less constructor.
+            </summary>
+            <param name="sciaEngineerSystemPath">provide string with path to Scia Engineer install directory </param>
+            <param name="appTempPath">provide string with path to desired temp location, it can be relative e.g. @".\\temp"</param>
+            /// <param name="ReqAPIversion">Provide string with version of Scia Engineer you are going to use. This version can be found in Scia Engineer application in Help>About</param>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.RunSCIAEngineer(SCIA.OpenAPI.Environment.GuiMode)">
+            <summary>
+            Method for running the Scia Engineer instance with options of GUI visibility
+            </summary>
+            <param name="guimode">provide the <see cref="T:SCIA.OpenAPI.Environment.GuiMode"/> to define the mode of gui visibility</param>
+            <returns>Bool saying whether Scia Engineer started successfully</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.OpenProject(System.String)">
+            <summary>
+            Method for opening Scia Engineer projects
+            </summary>
+            <param name="path">String containing path to the .esa project file</param>
+            <returns>Returns the <see cref="T:SCIA.OpenAPI.EsaProject"/> instance</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.CloseAllProjects(SCIA.OpenAPI.SaveMode)">
+            <summary>
+            Method for closing all projects with options for saving
+            </summary>
+            <param name="savemode"> provide the <see cref="T:SCIA.OpenAPI.SaveMode"/> to define the project saving mode during close </param>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.CreateProject(System.Guid,System.Guid@)">
+            <summary>
+            Method for creating new project from scratch. Dialogue for selection of material, functionalities, etc. is displayed.
+            </summary>
+            <param name="projectTypeID"></param>
+            <param name="projectID"></param>
+            <returns> Instance of the <see cref="T:SCIA.OpenAPI.EsaProject"/> </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.ImportProjectFromFile(SCIA.OpenAPI.Environment.TypeOfExtProject,System.String,System.Guid@)">
+            <summary>
+            Method for importing external file as new Scia Engineer project.
+            </summary>
+            <param name="ImportType"> type of project being imported, see <see cref="T:SCIA.OpenAPI.Environment.TypeOfExtProject"/> for details </param>
+            <param name="ProjectPath"> string containing path to external file </param>
+            <param name="ProjectID"> variable where the guid of new <see cref="T:SCIA.OpenAPI.EsaProject"/> instance is written </param>
+            <returns> Instance of the <see cref="T:SCIA.OpenAPI.EsaProject"/> </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Environment.UpdateProject(SCIA.OpenAPI.Environment.TypeOfExtProject,System.String,System.Guid)">
+            <summary>This method update the currenlty opened project (defined by guid) by some external file. </summary>                
+            <param name="UpdateType">Define the type of external project you want to use for update.</param>
+            <param name="UpdateFilePath">Path to external file that will be used for update.</param>
+            <param name="ProjectIDToUpdate">GUID of opened project that should be updated from external file.</param>
+        </member>
+        <member name="T:SCIA.OpenAPI.Environment.TypeOfExtProject">
+            <summary> Enum defining the type of external project </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.TypeOfExtProject.TypeXML">
+            <summary> Project defined within XML file </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.TypeOfExtProject.TypeESA">
+            <summary> Scia Engineer project </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.TypeOfExtProject.TypeRevit">
+            <summary> Autodesk Revit project </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.TypeOfExtProject.TypeTekla">
+            <summary> Tekla project </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.TypeOfExtProject.TypeIFC">
+            <summary> Project defined within IFC file </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.TypeOfExtProject.TypeAEF">
+            <summary> Project defined using Analytical Exchange Format saved .xlsx. See http://dev.aef.guide/Default.htm </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.Environment.GuiMode">
+            <summary> Enum for definition of visibility of GUI </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.GuiMode.ShowWindowHide">
+            <summary> start with hidden gui OR hide gui</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.GuiMode.ShowWindowShow">
+            <summary> start with visible gui OR show gui</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.GuiMode.ShowWindowShowNA">
+            <summary> start with visible gui, but the window is not active OR show gui without making active</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.GuiMode.ShowWindowShowNormal">
+            <summary> start with visible gui OR show gui, this one should be used when executing new SCIA Engineer instance with visible gui</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.GuiMode.ShowWindowShowMinimized">
+            <summary> start with visible gui, window minimized</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.Environment.GuiMode.ShowWindowShowMinNoActive">
+            <summary> start with visible gui, window minimized and not active</summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.SaveMode">
+            <summary> Enum for definition saving project during closing </summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.SaveMode.SaveChangesNo">
+            <summary> do not save the project</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.SaveMode.SaveChangesPrompt">
+            <summary> display messagebox whether to save or not</summary>
+        </member>
+        <member name="F:SCIA.OpenAPI.SaveMode.SaveChangesYes">
+            <summary> save the project</summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.EsaProject">
+            <summary>Treats the <see cref="T:SCIA.OpenAPI.Structure"/> and provides functionality regarding the Project like closing project, running analysis, etc.</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.EsaProject.#ctor(System.Object)">
+            <summary>
+            Constructor used for initialization of new project. \n Instance of this class is initialized by <see cref="M:SCIA.OpenAPI.Environment.CreateProject(System.Guid,System.Guid@)"/>, <see cref="M:SCIA.OpenAPI.Environment.OpenProject(System.String)"/> or <see cref="M:SCIA.OpenAPI.Environment.ImportProjectFromFile(SCIA.OpenAPI.Environment.TypeOfExtProject,System.String,System.Guid@)"/> . \n During the initialization, the new instance of <see cref="T:SCIA.OpenAPI.Structure"/> is set.
+            </summary>
+            <param name="serviceWrapper">object describing the connection to SciaEngineer, is passed for <see cref="T:SCIA.OpenAPI.Environment"/></param>
+        </member>
+        <member name="M:SCIA.OpenAPI.EsaProject.Finalize">
+            <summary>
+            Destructor for destroying the project. It closes the project without saving and nulls the <see cref="F:SCIA.OpenAPI.EsaProject.MyProjectID"/>.
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.EsaProject.RunCalculation">
+            <summary>
+            Method for execution of linear FEM analysis
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.EsaProject.CreateMesh">
+            <summary>
+            Method for calling the SEn command "Analysis.Meshgeneration"
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.EsaProject.CloseProject(SCIA.OpenAPI.SaveMode)">
+            <summary>
+            Method for closing the project with options for saving
+            </summary>
+            <param name="savemode"> provide the <see cref="T:SCIA.OpenAPI.SaveMode"/> to define the project saving mode during close </param>
+        </member>
+        <member name="P:SCIA.OpenAPI.EsaProject.ProjectID">
+            <summary>
+            Unique identifier of the project
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.EsaProject.Model">
+            <summary>
+            This property keeps the instance of the <see cref="T:SCIA.OpenAPI.Structure"/>.
+            </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.Point3D">
+            <summary> Provides methods for work with 3D positions in the Scia Engineer model. You get new Point3D object e.g. when you call method for getting position of finite mesh element. Point3D is not used for definition of structural nodes - for structureal nodes we have the <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/>.</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.Point3D.#ctor(System.Double,System.Double,System.Double)">
+            <summary> Constructor for initialization of new point </summary>
+            <param name="x"> x coordinate</param>
+            <param name="y"> y coordinate</param>
+            <param name="z"> z coordinate</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Point3D.X">
+            <summary> x coordinate </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Point3D.Y">
+            <summary> y coordinate </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Point3D.Z">
+            <summary> z coordinate </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.Beam">
+            <summary>Provides methods for work with beams in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.Beam.#ctor(System.Guid,System.String,System.Guid,System.Guid[])">
+            <summary>This constructor <c>Beam</c> initializes new beam from given <paramref name="nodes"/>, with defined <paramref name="css"/>, <paramref name="name"/> and <paramref name="id"/> </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="css">guid of cross-section of the beam, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured"/> or <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric"/> for details</param>
+            <param name="nodes">guid array of nodes used for beam definition; 2 nodes define line, more nodes define spline, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Beam.Css">
+            <summary> Guid of cross-section of the beam, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured"/> or <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric"/> for details</summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Beam.Nodes">
+            <summary> guid array of nodes used for beam definition; 2 nodes define line, more nodes define spline </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Beam.EccentricityEy">
+            <summary> Eccentricity in Y direction to the definition point of the cross-section.  This value is added to the eccentricity defined by <see cref="P:SCIA.OpenAPI.StructureModelDefinition.Beam.CurveAlignment"/> property.</summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Beam.EccentricityEz">
+            <summary> Eccentricity in Z direction to the definition point of the cross-section. This value is added to the eccentricity defined by <see cref="P:SCIA.OpenAPI.StructureModelDefinition.Beam.CurveAlignment"/> property.</summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Beam.CurveAlignment">
+            <summary> Placement of cross-section definition point to beam system line: \n Centre = 0, Top = 1, Bottom = 2, Left = 3, Right = 4, TopLeft = 5, TopRight = 6, BottomLeft = 7, BottomRight = 8 \n This property is good for easy definition of eccentricity of cross-section. </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree">
+            <summary>Provides methods for work point with free force in the Scia Engineer model. Free forces are used for generation of forces on 2D members. </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.#ctor(System.Guid,System.String,System.Guid,System.Double,System.Double,System.Double,System.Double,System.Int32,System.Double,System.Double)">
+            <summary>
+            Constructor for initialization of new free force with GCS coordinates and validity from-to
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="loadCaseId">unique identified of the load case, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/> for details</param>
+            <param name="value">value of force in [N]</param>
+            <param name="dx">global x coordinate of the free load</param>
+            <param name="dy">global y coordinate of the free load</param>
+            <param name="dz">globalz coordinate of the free load</param>
+            <param name="direction">direction of the surface force X = 0, Y = 1, Z = 2</param>
+            <param name="valZfrom">global z coordinate FROM which the validity will be considered (i.e. generated forces will be placed on 2D members that are placed within validity range)</param>
+            <param name="valZto">global z coordinate TO which the validity will be considered</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.LoadCaseId">
+            <summary>
+            unique identified of the load case, see <see cref="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.LoadCaseId"/> for details
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.Value">
+            <summary>
+            value of force in [N]
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.Dx">
+            <summary>
+            global x coordinate of the free load
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.Dy">
+            <summary>
+            global y coordinate of the free load
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.Dz">
+            <summary>
+            globalz coordinate of the free load
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.Direction">
+            <summary> Direction: X = 0, Y = 1, Z = 2 </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.ValZfrom">
+            <summary>
+            global z coordinate FROM which the validity will be considered (i.e. generated forces will be placed on 2D members that are placed within validity range)
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree.ValZto">
+            <summary>
+            global z coordinate TO which the validity will be considered
+            </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad">
+            <summary>
+            Provides methods for work with structural nodes in the Scia Engineer model. Structural nodes are used for definition another structural entities.
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad.#ctor(System.Guid,System.String,System.Double,System.Guid,System.Guid,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="value">value of surface force in [N/m2]</param>
+            <param name="loadCaseId">unique identified of the load case, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/> for details</param>
+            <param name="member2DId">unique identifier of the 2D member where the load will be applied, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Slab"/> for details</param>
+            <param name="direction">direction of the surface force X = 0, Y = 1, Z = 2</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad.Value">
+            <summary>value of surface force in [N/m2] </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad.LoadCaseId">
+            <summary>unique identified of the load case, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/> for details </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad.Member2DId">
+            <summary>unique identifier of the 2D member where the load will be applied, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Slab"/> for details </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad.Direction">
+            <summary> Direction: X = 0, Y = 1, Z = 2 </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured">
+            <summary>Provides methods for work with cross-sections created from prefabricated cross-section catalogues in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.#ctor(System.Guid,System.String,System.Guid,System.String,System.Int32,System.Int32)">
+            <summary> This constructor initializes new manufactured cross-section. </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="material">guid of the material used for cross-section definition, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Material"/> for details</param>
+            <param name="profile">string with the profile name, e.g. "IPE200"</param>
+            <param name="formCode">represents type of the cross section, see <see cref="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.FormCode"/> for details</param>
+            <param name="descriptionId">The description of the hot rolled and cold formed cross-section referring to the source of manufacturer, see <see cref="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.DescriptionId"/> for details</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.Material">
+            <summary>Guid of the material used for cross-section definition, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Material"/> for details</summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.Profile">
+            <summary>
+            String with the profile name, e.g. "IPE200"
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.FormCode">
+            <summary> Property <c>FormCode</c> represents type of the cross section: \n
+            NotUsed = 0, \n ISection = 1, \n RectangularHollowSection = 2, \n CircularHollowSection = 3, \n LSection = 4, \n ChannelSection = 5, \n TSection = 6, \n FullRectangularSection = 7, \n FullCircularSection = 11, \n AsymmetricISection = 101, \n RolledZSection = 102, \n GeneralColdFormedSection = 110, \n ColdFormedAngleSection = 111, \n ColdFormedChannelSection = 112, \n ColdFormedZSection = 113, \n ColdFormedCSection = 114, \n ColdFormedOmegaSection = 115, \n ColdFormedCSectionEavesBeam = 116, \n ColdFormedCPlusSection = 117, \n ColdFormedZEDSection = 118, \n ColdFormedZEDSectionAsymmetricLips = 119, \n ColdFormedZEDSectionInclinedLip = 120, \n ColdFormedSigmaSection = 121, \n ColdFormedSigmaSectionStiffened = 122, \n ColdFormedSigmaPlusSection = 123, \n ColdFormedSigmaSectionEavesBeam = 124, \n ColdFormedSigmaPlusSectionEavesBeam = 125, \n ColdFormedZEDSectionBothLipsInclined = 126, \n ColdFormedIPlusSection = 127, \n ColdFormedISPlusSection = 128, \n ColdFormedSigmaSectionAsymmetric = 129, \n ColdFormed2CSection = 130, \n RailTypeKA = 150, \n RailTypeKF = 151, \n RailTypeKG = 152, \n SFB = 153, \n IFBA = 154, \n IFBB = 155, \n THQ = 156, \n VirtualJoist = 160, \n MinusLSection = 1002
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured.DescriptionId">
+            <summary> The description of the hot rolled and cold formed cross-section referring to the source of manufacturer: \n
+            NotSpecified = 0, \n EuropeanIBeam = 1, \n EuropeanStandardBeam = 2, \n EuropeanWideFlangeBeam = 3, \n WideFlangeColumn = 4, \n WideFlangeBearingPile = 5, \n ChannelWithParallelFlanges = 6, \n EuropeanStandardChannel = 7, \n EqualLegAngle = 8, \n UnequalLegAngle = 9, \n LegAngle = 10, \n BritishUniversalBeam = 11, \n BritishUniversalColumn = 12, \n BritishUniversalBearingPileWithWideFlanges = 13, \n WideFlatBar = 14, \n ColdFormedCSection = 15, \n ColdFormedAngle = 16, \n ColdFormedOmegaSection = 17, \n ColdFormedChannelSection = 18, \n ColdFormedZSection = 19, \n CircularHollowSection = 20, \n ColdFormedCircularHollowSection = 21, \n FlatBar = 22, \n StructuralTeeCutFromIShape = 23, \n AsymmetricalISection = 24, \n RectangularHollowSection = 25, \n RoundBar = 26, \n ColdFormedRectangularHollowSection = 27, \n ChannelSection = 28, \n BritishJoist = 29, \n RailSection = 30, \n TeeShape = 31, \n ZSection = 32, \n AmericanWideFlangeBeamMetricNamingConvention = 33, \n AmericanWideFlangeBeamImperialNamingConvention = 34, \n AmericanMiscellaneousBeamMetricNamingConvention = 35, \n AmericanMiscellaneousBeamImperialNamingConvention = 36, \n AmericanBearingPileMetricNamingConvention = 37, \n AmericanBearingPileImperialNamingConvention = 38, \n AmericanStandardBeamMetricNamingConvention = 39, \n AmericanStandardBeamImperialNamingConvention = 40, \n AmericanStandardChannelMetricNamingConvention = 41, \n AmericanStandardChannelImperialNamingConvention = 42, \n AmericanMiscellaneousChannelMetricNamingConvention = 43, \n AmericanMiscellaneousChannelImperialNamingConvention = 44, \n AmericanSingleAngleMetricNamingConvention = 45, \n AmericanSingleAngleImperialNamingConvention = 46, \n AmericanStructuralTeeCutFromIShapeMetricNamingConvention = 47, \n AmericanStructuralTeeCutFromIShapeImperialNamingConvention = 48, \n AmericanRectangularAndSquareHollowStructuralSectionMetricNamingConvention = 49, \n AmericanRectangularAndSquareHollowStructuralSectionImperialNamingConvention = 50, \n AmericanRoundHollowStructuralSectionMetricNamingConvention = 51, \n AmericanRoundHollowStructuralSectionImperialNamingConvention = 52, \n AmericanSteelPipeMetricNamingConvention = 53, \n AmericanSteelPipeImperialNamingConvention = 54, \n JapaneseHSection = 55, \n ColdFormedZedSection = 56, \n ColdFormedSigmaSection = 57, \n ColdFormedSectionEaveBeam = 58, \n IntegratedFloorBeam = 59, \n SlimFloorBeam = 60, \n TopHatBeam = 61, \n IndianStandardLightWeightChannels = 62, \n IndianStandardColumnSections = 63, \n IndianStandardWideFlangeBeams = 64, \n IndianStandardUnequalLegAngles = 65, \n IndianStandardMediumWeightParallelFlangeChannels = 66, \n IndianStandardMediumWeightChannels = 67, \n IndianStandardMediumWeightBeams = 68, \n IndianStandardLightWeightBeams = 69, \n IndianStandardJuniorChannels = 70, \n IndianStandardJuniorBeams = 71, \n IndianStandardHeavyWeightBeams = 72, \n IndianStandardEqualAngles = 73, \n ColdFormedSquareAndRectangularHollowSection = 74, \n SquareAndRectangularHollowSection = 75, \n ChannelSectionWithInclinedFlanges = 76, \n SectionWithHighWeb = 77, \n SectionWithWideFlange = 78, \n SquareBar = 79, \n StructuralTeeCutFromUniversalBeam = 80, \n StructuralTeeCutFromUniversalColumn = 81, \n Jumbo355SquareHollowSection = 82, \n Celsius355SquareHollowSection = 83, \n Hybox355ColdFormedSquareHollowSection = 84, \n Jumbo355RectangularHollowSection = 85, \n Celsius355RectangularHollowSection = 86, \n Hybox355ColdFormedRectangularHollowSection = 87, \n Jumbo355CircularHollowSection = 88, \n Celsius355CircularHollowSection = 89, \n Hybox355ColdFormedCircularHollowSection = 90, \n ChineseHshape = 91, \n ChineseCutTsection = 92, \n ChineseColdFormedSquarePipe = 93, \n ChineseColdFormedRectangularTube = 94, \n ChineseColdFormedRoundPipe = 95, \n ChineseIbeam = 96, \n ChineseChannelSteel = 97, \n ChineseEqualLegAngleSteel = 98, \n ChineseUnequalLegAngleSteel = 99, \n IcecZPurlin = 100, \n IcecCPurlin = 101, \n BrazilianIAndHSection = 102, \n CelsiusLargeCircularHollowSection = 103, \n ColdFormedAsymmetricSigmaSection = 104, \n ColdFormedIplusSection = 105, \n ColdFormedISplusSection = 106, \n SsmaStudColdFormedCSectionWithLips = 107, \n SsmaTrackColdFormedCSectionWithoutLips = 108, \n EuropeanExtraWideFlangeBeam = 109, \n RussianHotRolledBeam = 110, \n BritishParallelFlangeChannel = 111, \n BritishChannelWithTaperFlanges = 112, \n ColdFormedSectionMeTfloor = 113, \n ColdFormedChannelSectionMeTframe = 114, \n ColdFormedCSectionMeTframe = 115, \n VirtualJoist = 116, \n VirtualJoistGirder = 117, \n ColdFormedSigmaPlusSection = 118
+            </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric">
+            <summary>Provides methods for work with cross-sections created as geometrical shapes with parameters in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.#ctor(System.Guid,System.String,System.Guid,System.Int32,System.Double[])">
+            <summary> This constructor initializes new cross-section defined as geometrical shape. </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="material">guid of the material used for cross-section definition, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Material"/> for details</param>
+            <param name="profileType">represents type of geometrical shape, see <see cref="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.ProfileType"/> for details</param>
+            <param name="parameters">array of doubles representing parameters of geometrical shape, see <see cref="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.Parameters"/> for details</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.Material">
+            <summary>Guid of the material used for cross-section definition, see <see cref="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.Material"/> for details</summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.ProfileType">
+            <summary> Rrepresents type of geometrical shape: \n Circle = 0, \n Rectangle = 1, \n DoubleRectangle = 2, \n TripleRectangle = 3, \n RectangleWithPlates = 4, \n DoubleRectangleWithPlates = 5, \n ISection = 6, \n ISectionWithHaunch = 7, \n TSection = 8, \n CSection = 9, \n LSection = 10, \n LSectionOpposite = 11, \n USection = 12, \n Oval = 13, \n Pipe = 14, \n Polygon = 15, \n XSection = 16, \n ZSection = 17, \n Box = 18, \n DoubleBox = 19, \n IRolled = 20, \n IRolledAsymmetric = 21, \n Tube = 22, \n Angle = 23, \n Channel = 24, \n TTee = 25, \n ZZee = 26, \n ColdFormedChannel = 27, \n ColdFormedChannelWithLips = 28, \n ColdFormedZee = 29 </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.Parameters">
+            <summary>Parameters for particular <see cref="P:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric.ProfileType"/>s can be found at http://dev.aef.guide/Default.htm#Annexes/Supported%20shapes%20of%20parametric%20cross-section.htm%3FTocPath%3DAnnexes%7C_____3 </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.StructureEntity">
+            <summary>Parent class for the rest of model entities carying basic properties</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.StructureEntity.#ctor">
+            <summary>
+            Nonparametric constructor of new structure entity
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.StructureEntity.#ctor(System.Guid,System.String)">
+            <summary>
+            Constructor for initialization of new structure entity object
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.StructureEntity.Id">
+            <summary>
+            unique identifier - guid
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.StructureEntity.Name">
+            <summary>
+            human readable name
+            </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase">
+            <summary>Provides methods for work with load cases in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.LoadCase.#ctor(System.Guid,System.String,System.Int32,System.Guid,System.Int32)">
+            <summary> Constructor for initialization of new load case </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="actionType">type of action caused by load case: \n Permanent = 0, \n Variable = 1, \n Accidental = 2</param>
+            <param name="loadGroupId">guid of <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadGroup"/> used for definition of load case</param>
+            <param name="loadCaseType">type of load case: \n SelfWeight = 0, \n Standard = 1, \n Prestress = 2, \n Dynamic = 3, \n PrimaryEffect = 4, \n Static = 5 </param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.LoadCase.ActionType">
+            <summary> Type of action caused by load case: \n Permanent = 0, \n Variable = 1, \n Accidental = 2 </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.LoadCase.LoadGroupId">
+            <summary> Guid of <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadGroup"/> used for definition of load case </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.LoadCase.LoadCaseType">
+            <summary> Type of load case: \n SelfWeight = 0, \n Standard = 1, \n Prestress = 2, \n Dynamic = 3, \n PrimaryEffect = 4, \n Static = 5 </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.LoadGroup">
+            <summary>Provides methods for work with load groups in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.LoadGroup.#ctor(System.Guid,System.String,System.Int32)">
+            <summary>
+            Constructor for initialization of new load group
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="type">type of load group: \n Permanent = 0, \n Variable = 1, \n Accidental = 2, \n Seismic = 3</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.LoadGroup.Type">
+            <summary> Type of load group: \n Permanent = 0, \n Variable = 1, \n Accidental = 2, \n Seismic = 3 </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.Material">
+            <summary> Provides methods for work with materials in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.Material.#ctor(System.Guid,System.String,System.Int32,System.String)">
+            <summary>
+            Constructor for initialization of new material
+            </summary>
+            <param name="id"> unique identifier - guid</param>
+            <param name="name"> human readable name</param>
+            <param name="type"> type of material: \n Concrete = 0, \n Steel = 1, \n Timber = 2, \n Aluminium = 3, \n Masonry = 4, \n Other = 5</param>
+            <param name="quality">name of the material in the catalogue corresponding to name of material in Scia Engineer,e.g. "S 235", "C25/30", etc.</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Material.Type">
+            <summary> Type of material: \n Concrete = 0, \n Steel = 1, \n Timber = 2, \n Aluminium = 3, \n Masonry = 4, \n Other = 5 </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Material.Quality">
+            <summary> Name of the material in the catalogue corresponding to name of material in Scia Engineer,e.g. "S 235", "C25/30", etc. </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode">
+            <summary>Provides methods for work with forces defined in structural nodes in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode.#ctor(System.Guid,System.String,System.Double,System.Guid,System.Guid,System.Int32)">
+            <summary>
+            Constructor for initialization of new force in node.
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="value">value of force in N</param>
+            <param name="loadCaseId">unique identified of the load case, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/> for details</param>
+            <param name="nodeId">unique identifier of the node where the force will be defined, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details</param>
+            <param name="direction">direction of the surface force X = 0, Y = 1, Z = 2</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode.Value">
+            <summary>
+            value of force in [N]
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode.LoadCaseId">
+            <summary>
+            unique identified of the load case, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/> for details
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode.NodeId">
+            <summary>
+            unique identifier of the node where the force will be defined, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode.Direction">
+            <summary> Direction: X = 0, Y = 1, Z = 2 </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.PointSupport">
+            <summary>Provides methods for work with supports defined in structural nodes in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.PointSupport.#ctor(System.Guid,System.String,System.Guid)">
+            <summary>
+            Constructor for initialization of new support in node
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="nodeId">unique identifier of the node where the force will be defined, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.PointSupport.NodeId">
+            <summary>
+            unique identifier of the node where the force will be defined, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details
+            </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.Slab">
+            <summary>Provides methods for work with 2D members in the Scia Engineer model</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.Slab.#ctor(System.Guid,System.String,System.Int32,System.Guid,System.Double,System.Guid[])">
+            <summary>
+            Constructor for initialization of slab defined by the set of structural nodes
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="type">property for definition type of slab: \n Plate = 0, \n Wall = 1, \n Shell = 2, \n Other = int.MaxValue</param>
+            <param name="materialId">guid of the material used for the slab, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Material"/> for details</param>
+            <param name="thickness">define the thickness of the slab in [m]</param>
+            <param name="nodes">guid array of nodes for definition of slab shape, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Slab.Thickness">
+            <summary>
+            Define the thickness of the slab in [m]
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Slab.MaterialId">
+            <summary>
+            Guid of the material used for the slab, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Material"/> for details
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Slab.Type">
+            <summary> Property for definition type of slab: \n Plate = 0, \n Wall = 1, \n Shell = 2, \n Other = int.MaxValue </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Slab.Nodes">
+            <summary>
+            Guid array of nodes for definition of slab shape, see <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> for details
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.Slab.Eccentricity">
+            <summary>
+            Eccentricity of slabs's middle plane to system plane
+            </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.StructureModelDefinition.StructNode">
+            <summary>Provides methods for work with structural nodes in the Scia Engineer model. Structural nodes are used for definition another structural entities like beams, slabs, etc.</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.StructureModelDefinition.StructNode.#ctor(System.Guid,System.String,System.Double,System.Double,System.Double)">
+            <summary>
+            Constructor for initialization of structural node
+            </summary>
+            <param name="id">unique identifier - guid</param>
+            <param name="name">human readable name</param>
+            <param name="x">x coordinate</param>
+            <param name="y">y coordinate</param>
+            <param name="z">z coordinate</param>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.StructNode.X">
+            <summary> x coordinate </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.StructNode.Y">
+            <summary> y coordinate </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.StructureModelDefinition.StructNode.Z">
+            <summary> z coordinate </summary>
+        </member>
+        <member name="T:SCIA.OpenAPI.Results.Result">
+            <summary>
+            Class treating the ResultsAPI instance based on the provided ResultKey
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.#ctor">
+            <summary>
+            Constructor for initialization of new result object
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetActualLayer">
+            <summary>
+            Method for getting the currenlty set layer
+            </summary>
+            <returns>index of current layer</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetBeamLength">
+            <summary>
+            Method for getting the length of beam for which the Result was loaded
+            </summary>
+            <returns> value with length of beam </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetLayersCount">
+            <summary>
+            Method for getting the count of layers in this result. 
+            This is applicable for results for combinations. 
+            For instance, in envelope combination we have a combination key (describing linear combinaiton) that causes extrem of some specific magnitude (e.g. My) within the result (N,Vy,Vz,My,Mz,Mx). All concomitant values (N,Vy,Vz,Mz,Mx) that are caused by this combination key (that makes My extreme) are stored in particular layer together with value of extreme magnitude.
+            So in one layer we can find extreme (min or max) value of one magnitude and concomitant values of all remaining magnitudes. 
+            In example with internal forces, we have 6 magnitudes and min/max extremes, so we have 2x6=12.
+            </summary>
+            <returns>Count of layers in this result</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetMagnitudeName(System.UInt32)">
+            <summary>
+            Method for getting the name of the magnitude on specific position in this result
+            </summary>
+            <param name="Index">provide the uint with index for which you want to get name</param>
+            <returns> name of the magnitude </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetMagnitudesCount">
+            <summary>
+            Method for getting the count of magnitudes for this result
+            </summary>
+            <returns>count of magnitudes</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetMeshElementCount">
+            <summary>
+            Method for getting the count of mesh elements on 2D member for which this result was loaded
+            </summary>
+            <returns>count of mesh elements on 2D member</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetResultKey">
+            <summary>
+            Method for getting the <see cref="T:SCIA.OpenAPI.Results.ResultKey"/> object for which this result was loaded
+            </summary>
+            <returns> object of result key type, see <see cref="T:SCIA.OpenAPI.Results.ResultKey"/> for details </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetResultType">
+            <summary>
+            Method for getting the <see cref="T:SCIA.OpenAPI.Results.ResultType"/> object for which this result was loaded
+            </summary>
+            <returns>object of result key type, see <see cref="T:SCIA.OpenAPI.Results.ResultType"/> for details </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetSectionCount">
+            <summary>
+            Method for getting the count of sections on 1D member for which this result was loaded
+            </summary>
+            <returns>count of sections on 1D member</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetSectionPosX(System.UInt32)">
+            <summary>
+            Method for getting the x-coordinate for specific section index, x is measured from the beginning of the beam
+            </summary>
+            <param name="Section"> provide the index of the section </param>
+            <returns> value saying how far the section is from beginning of the beam</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetValue(System.UInt32,System.UInt32)">
+            <summary>
+            Method for getting specific magnitude value in specific element
+            </summary>
+            <param name="Magnitude">Index of magnitude, see <see cref="P:SCIA.OpenAPI.Results.ResultKey.Magnitude"/> for details</param>
+            <param name="Element">Index of element</param>
+            <returns>Double with value of specified magnitude in specified element</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetValueStr(System.UInt32,System.UInt32)">
+            <summary>
+            Method for getting specific magnitude value in specific element for string results
+            </summary>
+            <param name="Magnitude">Index of magnitude, see <see cref="P:SCIA.OpenAPI.Results.ResultKey.Magnitude"/> for details</param>
+            <param name="Element">Index of element</param>
+            <returns></returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.SetActualLayer(System.Int32)">
+            <summary>
+            Method for setting the current layer.
+            </summary>
+            <param name="ActualLayer">specify the index of layer you want to set</param>
+            <returns>bool with result of operation</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.Result.GetTextOutput">
+            <summary>
+            This method can be used for printing the table with results into command line
+            </summary>
+            <returns> Returns the string with result table </returns>
+        </member>
+        <member name="T:SCIA.OpenAPI.Results.ResultKey">
+            <summary>
+            This class is used for definition of result you want to get.
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultKey.#ctor">
+            <summary>
+            Constructor for definition of new result key
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.Dimension">
+            <summary>
+            This enum defines the dimension of obtained results:\n
+            eDim_undefined = -1,\n
+            eDim_1D = 1,             //FB_1D //results on beams\n
+            eDim_2D = 2,             //FB_2D //2D macros\n
+            eDim_3D = 3,             //FB_3D //3D macros\n
+            eDim_reactionsPoint = 4, //FB_REA_PT, // reactions in points\n
+            eDim_reactionsLine = 5,  //FB_REA_LIN, // reactions on lines\n
+            eDim_2DSection = 6,      //Results on 2d sections\n
+            eDim_1DSection = 7,       //Results on 1d sections\n
+            eDim_Storey = 8          //Results per storeys
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.EntityName">
+            <summary>
+            Name of the entity/member (SEn name) for which you want to get results
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.EntityType">
+            <summary>
+            This enum defines the type of entity for which you results will be obtained: eDsElementType_None, eDsElementType_Beam, eDsElementType_Slab, eDsElementType_Storey,  eDsElementType_Node, eDsElementType_SubSlab, eDsElementType_SectionOnSlab, eDsElementType_Boundary, eDsElementType_Storey_RN, eDsElementType_PointSupportPoint, eDsElementType_PointSupportLine, eDsElementType_LineSupportLine, eDsElementType_LineSupportSurface, eDsElementType_Connection, eDsElementType_IntegrationStrip, eDsElementType_Independent, eDsElementType_IntegrationMember
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.Location">
+            <summary>
+            This enum defines the position for which the 2D results will be binded, like centres of mesh elements or in nodes with different options for averaging
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.Magnitude">
+            <summary>
+            Property representing the magnitude index. See the following list of FEM-related <see cref="P:SCIA.OpenAPI.Results.ResultKey.ResultType"/>s and their magnitudes: \n 
+            FemBeamDeformations: 				Ux, Uy, Uz, Fix, Fiy, Fiz, Uglob, eMagnitude_Count \n
+            FemBeamRelativeDeformations:		Uy, Rel_Uy, Uz, Rel_Uz, eMagnitude_Count \n
+            FemBeamInnerForces:					N = 0, Vy, Vz, Mx, My, Mz, Vr, eMagnitude_Count \n
+            FemBeamContactForces:				Rx, Ry, Rz, Mrx, Mry, Mrz, eMagnitude_Count \n
+            FemSlabDeformations:				Ux, Uy, Uz, Fix, Fiy, Fiz, Uglob, eMagnitude_Count \n
+            FemSlabInnerForces_Extended:		mx, my, mxy, qx, qy, nx, ny, qxy, m1, m2, alphab, mtmaxb, qmaxb, etab, n1, n2, alpham, qmaxm, mxD_plus, myD_plus, mcD_plus, mxD_minus, myD_minus, mcD_minus, nxD, nyD, ncD, eMagnitude_Count \n
+            FemSlabInnerForces:					mx = 0, my, mxy, qx, qy, nx, ny, qxy, eMagnitude_Count \n
+            FemSlabInnerForces_Principal:		m1 = 0, m2, alphab, mtmaxb, qmaxb, betab, n1, n2, alpham, qmaxm, eMagnitude_Count \n
+            FemSlabInnerForces_Design:			mxD_plus, myD_plus, mcD_plus, mxD_minus, myD_minus, mcD_minus, nxD, nyD, ncD, eMagnitude_Count \n
+            FemSlabStress:						sigx_plus, sigy_plus, sigxy_plus, sigx_minus, sigy_minus, sigxy_minus, sig1_plus, sig2_plus, alpha_plus, sigE_plus, sig1_minus, sig2_minus, alpha_minus, sigE_minus, taumax, sigZ, sigxb, sigyb, sigxyb, sigxm, sigym, sigxym, sigEm1, taux, tauy, sigEmax, sigEm2, sigT_plus, sigT_minus, sigTmax, sigTm, sigR_plus, sigR_minus, sigRmax, sigRm, sigB_plus, sigB_minus, sigBmax, sigBm, sigm1, sigm2, alpham, eMagnitude_Count \n
+            FemSlabContactStress:				tauzx, tauyz, sigz, eMagnitude_Count \n
+            FemResultingForces:					Fx, Fy, Fz, Mx, My, Mz, eMagnitude_Count \n
+            FemNodeReactions:					Rx, Ry, Rz, Mrx, Mry, Mrz, eMagnitude_Count \n
+            FemLineReactionsIntesities:			Rx, Ry, Rz, Mrx, Mry, Mrz, rx, ry, rz, mrx, mry, mrz, eMagnitude_Count \n
+            FemNodalMasses:						Mx, My, Mz, Fix, Fiy, Fiz, eMagnitude_Count \n
+            FemStrain:							eBasic0, eBasic1, eBasic2, eBasic3, eBasic4, eBasic5, eBasic6, eBasic7, eEps_x_p, eEps_y_p, eGamma_xy_p, eEps_x_m, eEps_y_m, eGamma_xy_m, eEps_1_p, eEps_2_p, eAlpha_p, eEps_1_m, eEps_2_m, eAlpha_m, eEps_max_p, eEps_min_p, eEps_max_m, eEps_min_m, eEps_max, eEps_min, eEps_M_p, eEps_M_m, eEps_M, eMagnitude_Count \n
+            FemPlasticStrain:					\n
+            FemSubsoilOfMacros2D:				C1z, C2x, C2y, C1x, C1y, eMagnitude_Count \n
+            FemOtherDataForSoilin:				X, Y, w, eMagnitude_Count \n
+            FemModalFactors:					Wx, Wy, Wz, WxR, WyR, WzR, DampRatio, eMagnitude_Count \n
+            FemSlabIsotropicProperties:			E = 0, mi, h, DRel, eMagnitude_Count \n
+            FemNodeDeformations:				Ux, Uy, Uz, Fix, Fiy, Fiz, Uglob, eMagnitude_Count \n
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.ResultTypeID">
+            <summary>
+            Property representing the result type unique identifier
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.ResultType">
+            <summary>
+            Enum for definition type of result:\n
+            eNone = 0,\n
+            FEMBase results 2D: eFemDeformations = 1, eFemInnerForces = 2, eFemStress = 3, eFemContactStress = 4, eFemRatedQuantitesForReinforcement = 5, eFemReinforcement = 6, eFemPowerLoadOfMacros2D = 7, eFemTemperatureLoadOfMacros2D = 8, eFemSubsoilOfMacros2D = 9, eFemParametersOfIsotopyOnMacros2D = 10, eFemSubsoilForSoilin = 11, eFemOtherDataForSoilin = 12, eFemCracks = 13, eFemStrains = 14, eFemPlasticStrains = 15, eFemInnerForces_Extended = 16, eReactionsNodes = 17,\n
+            FEMBase results 1D: eFemBeamDeformation = 30, eFemBeamInnerForces = 31, eFemBeamContactForces = 32,//	FemBase results per storeys:eStoreyData, eStoreyDisplacements, eStoreyAccelerations, eStoreyForces, eStoreyAccidentalTorsion, eInterStoreyDrift, eReservedForRelease2013_1,\n
+            Recalculated FEMBase results: eFemBeamRelativeDeformation = 50, eFemResultingForces,\n
+            user-defined results: eTestCheck = 101, eTimberCheckSLS, eTimberCheckULS, eDFDesignAsLongitudinal, eDFCheckResponse, eDFInternalForces, eDFDesignShearNBR, eDFUserTemplate, e2DConcreteBrazil, e1DConcreteECEN, eCombinatorSlabStrain, eCombinatorBeamStrain, eMemberStress_Sigma, eFibrePosition, eFibreDeformation, eAdaptiveMesh, eELFLoads, eEN_1993_SteelULS, eEN_1993_SteelFire, eIDEA_StatiCa_Connection, eEN_1993_SteelSLS, eSIA_263_SteelULS, eSteel_SLS, eEN_1999_AluminiumULS, eLastResultType
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.RibRecalculationType">
+            <summary>
+            Enum for definition of recalculation type for ribs
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.CoordSystem">
+            <summary>
+            Enum for definition of result coordinate system:
+            eCoordSys_Local = 0,        // -	reactions in the nodes will be returned in rotated coordinate system
+                                        // -	reactions on lines will be returned in the local coordinate system of the line
+                                        // -	deformations,internal forces and contact stresses on the 1D elements will be returned in the principal coordinate system of the 1D element
+                                        // -	deformations and internal forces on the 2D elements will be returned in the local coordinate system of the 2D macroelement.\n
+            eCoordSys_Global = 1,   // -	reactions in the nodes will be returned in global coordinate system
+            			            // -	reactions on lines will be returned in the global coordinate system
+            			            // -	deformations and contact stresses on the beams will be returned in the global coordinate system
+            			            // -	inner forces on the beams will be returned in the coordinate system of the cross section
+            			            // -	deformations on the 2D elements will be returned in the global coordinate system\n
+            eCoordSys_User = 2,         // - deformations, ihned forces and contact stresses on the beams will be returned in the user coordinate system of the beam\n
+            eCoordSys_Principal = 3,    // - used only for storey results! \n
+            eCoordSys_ByMember = 4
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.CaseType">
+            <summary>
+            This enum defines the type of loading case for which results will be obtained: eDsElementType_LoadCase, eDsElementType_Combination, eDsElementType_CombiKey eDsElementType_NonlinearCombination, eDsElementType_Class, eDsElementType_MassCombination, eDsElementType_Stability
+            </summary>
+        </member>
+        <member name="P:SCIA.OpenAPI.Results.ResultKey.CaseId">
+            <summary>
+            This guid defines the loading case for which results will be obtained
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultKey.TextOutput">
+            <summary>
+            Method that provide text output of result key. It can be used to print the text representation of key into command line.
+            </summary>
+            <returns> string with result key</returns>
+        </member>
+        <member name="T:SCIA.OpenAPI.Results.ResultsAPI">
+            <summary> Class providing functionality for work with results storage in Scia Engineer. The initialization of RAPI can be done using the <see cref="M:SCIA.OpenAPI.Structure.InitializeResultsAPI"/> </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultsAPI.LoadResult(SCIA.OpenAPI.Results.ResultKey)">
+            <summary>
+            Method for loading results. \n note: Keep in mind that the wanted result must be calculated in Scia Engineer result storage to make you able to load this result. The automatic calculation of not-yet-calculated results on request does not work for all results (e.g. it works for internal forces for LoadCases, but not for Combinations for instance)
+            </summary>
+            <param name="Key"> Scia Engineer results are loaded based on the <see cref="T:SCIA.OpenAPI.Results.ResultKey"/></param>
+            <returns> Returns new instane of the <see cref="T:SCIA.OpenAPI.Results.Result"/> class</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultsAPI.GetMeshElementPosition(SCIA.OpenAPI.Results.Result,System.UInt32)">
+            <summary>
+            Method for getting global coordinates of mesh element
+            </summary>
+            <param name="result">provide any <see cref="T:SCIA.OpenAPI.Results.Result"/> object</param>
+            <param name="Element">provide uint number of element </param>
+            <returns>new <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Point3D"/> object</returns>
+        </member>
+        <member name="T:SCIA.OpenAPI.Results.ResultType">
+            <summary> This class provides functions for work with ResultTypes. You can e.g. get supported magnitudes of the result type, get the result name, etc. </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.AreResultValuesOnlyDoubles">
+            <summary>
+            Method for getting info whether all magnitudes return double values or not
+            </summary>
+            <returns> True if all magnitudes return doubles, False if at least one magnitude returns other-than-double value </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetConnectedMagnitude(System.Int32)">
+            <summary>
+            For string results only
+            </summary>
+            <param name="Index">  Specify the int value of interested magnitude. See <see cref="M:SCIA.OpenAPI.Results.Result.GetValue(System.UInt32,System.UInt32)"/> for details. </param>
+            <returns></returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetFemResultType">
+            <summary>
+            Method for getting the id of the result type
+            </summary>
+            <returns> Int with the number in the list of result types. See <seealso cref="P:SCIA.OpenAPI.Results.ResultKey.ResultType"/> for details.</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetID">
+            <summary>
+            Returns unique identifier of this results type
+            </summary>
+            <returns> Guid as unique identifier</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetMagnitudeName(System.Int32)">
+            <summary>
+            Method for getting the name of magnitude
+            </summary>
+            <param name="Index"> Specify the int value of interested magnitude. See <see cref="M:SCIA.OpenAPI.Results.Result.GetValue(System.UInt32,System.UInt32)"/> for details. </param>
+            <returns>String with the name of the magnitude</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetMagnitudesCount">
+            <summary>
+            Method for getting the number of magnitudes defined in this reslut type
+            </summary>
+            <returns> Int with count of magnitudes</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetMagnitudeValueType(System.Int32)">
+            <summary>
+            Method for gettin the type of value for a given magnitude
+            </summary>
+            <param name="Index">  Specify the int value of interested magnitude. See <see cref="M:SCIA.OpenAPI.Results.Result.GetValue(System.UInt32,System.UInt32)"/> for details. </param>
+            <returns> eValueType_Double = 0, eValueType_String = 1</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.GetResultName">
+            <summary>
+            Method for getting the name of the result represented by this result type
+            </summary>
+            <returns> String with name </returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Results.ResultType.IsFEMResult">
+            <summary>
+            Method for getting information whether these are results calculated in the solver or calculated by Scia Engineer
+            </summary>
+            <returns>True for FEM results; False for Scia Engineer results</returns>
+        </member>
+        <member name="T:SCIA.OpenAPI.Structure">
+            <summary>Provides methods for work with the Scia Engineer model - definition of new entities, synchronization of model with Scia Engineer model, etc. Class is initialized in <see cref="M:SCIA.OpenAPI.EsaProject.#ctor(System.Object)"/>.</summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.RefreshModel_ToSCIAEngineer">
+            <summary>
+            Send the content of the <see cref="T:SCIA.OpenAPI.Structure"/> to the data server of the Scia Engineer <see cref="T:SCIA.OpenAPI.EsaProject"/> instance
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.RefreshModel_FromSCIAEngineer">
+            <summary>
+            Load the content of the Scia Engineer <see cref="T:SCIA.OpenAPI.EsaProject"/> instance data server into the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateMaterial(SCIA.OpenAPI.StructureModelDefinition.Material)">
+            <summary>
+            Create new material in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="material">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Material"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateCrossSection(SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured)">
+            <summary>
+            Create new cross-section in the <see cref="T:SCIA.OpenAPI.Structure"/> from <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured"/>
+            </summary>
+            <param name="Css">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateCrossSection(SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric)">
+            <summary>
+            Create new cross-section in the <see cref="T:SCIA.OpenAPI.Structure"/> from <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric"/>
+            </summary>
+            <param name="Css">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateNode(SCIA.OpenAPI.StructureModelDefinition.StructNode)">
+            <summary>
+            Create new structural node in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="Node">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateBeam(SCIA.OpenAPI.StructureModelDefinition.Beam)">
+            <summary>
+            Create new beam node in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="Beam">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Beam"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateSlab(SCIA.OpenAPI.StructureModelDefinition.Slab)">
+            <summary>
+            Create new slab in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="slab">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Slab"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreatePointSupport(SCIA.OpenAPI.StructureModelDefinition.PointSupport)">
+            <summary>
+            Create new support in node in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="Support">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.PointSupport"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateLoadGroup(SCIA.OpenAPI.StructureModelDefinition.LoadGroup)">
+            <summary>
+            Create new load grou in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="Group">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadGroup"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateLoadCase(SCIA.OpenAPI.StructureModelDefinition.LoadCase)">
+            <summary>
+            Create new load case in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="LC">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreatePointLoadInNode(SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode)">
+            <summary>
+            Create new point load in node in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="PointLoad">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.PointLoadInNode"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreatePointLoadFree(SCIA.OpenAPI.StructureModelDefinition.PointLoadFree)">
+            <summary>
+            Create new free force in point in <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="PointLoadFree">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.PointLoadFree"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.CreateSurfaceLoad(SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad)">
+            <summary>
+            Create new surface load defined on slab in the <see cref="T:SCIA.OpenAPI.Structure"/>
+            </summary>
+            <param name="SurfaceLoad">provide any <see cref="T:SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad"/></param>
+            <returns>true if operation suceeded, false if failed</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.FindBeamDsId(System.String)">
+            <summary>
+            Method for getting the Scia Engineer ID of a <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Beam"/> from its name
+            </summary>
+            <param name="Name">provide the string with beam name as input</param>
+            <returns> uint with Scia Engineer ID</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.FindSlabDsId(System.String)">
+            <summary>
+            Method for getting the Scia Engineer ID of a <see cref="T:SCIA.OpenAPI.StructureModelDefinition.Slab"/> from its name
+            </summary>
+            <param name="Name">provide the string with beam name as input</param>
+            <returns> uint with Scia Engineer ID</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.FindNodeDsId(System.String)">
+            <summary>
+            Method for getting the Scia Engineer ID of a <see cref="T:SCIA.OpenAPI.StructureModelDefinition.StructNode"/> from its name
+            </summary>
+            <param name="Name">provide the string with beam name as input</param>
+            <returns> uint with Scia Engineer ID</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.FindLoadCaseDsId(System.Guid)">
+            <summary>
+            Method for getting the Scia Engineer ID of a <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/> from its unique identifier (guid)
+            </summary>
+            <param name="Id">provide guid of <see cref="T:SCIA.OpenAPI.StructureModelDefinition.LoadCase"/></param>
+            <returns> uint with the Scia Engineer ID</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.FindNonlinearCombinationDsId(System.Guid)">
+            <summary>
+            !!!NOT WORKING YET, DO NOT USE IT!!!
+            </summary>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.InitializeResultsAPI">
+            <summary>
+            Method for initialization of ResultsAPI
+            </summary>
+            <returns>initialized <see cref="T:SCIA.OpenAPI.Results.ResultsAPI"/> object</returns>
+        </member>
+        <member name="M:SCIA.OpenAPI.Structure.FindMaterialGuid(System.String)">
+            <summary>
+            Method for getting the guid of material's name
+            </summary>
+            <param name="name">provide string with material name</param>
+            <returns>guid of material</returns>
+        </member>
+    </members>
+</doc>
