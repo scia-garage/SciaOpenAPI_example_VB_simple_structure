@@ -13,7 +13,7 @@
         End If
         Console.WriteLine($"SEn opened")
         Dim proj As SCIA.OpenAPI.EsaProject
-        proj = env.OpenProject("C:\Users\jbroz\OneDrive - SCIA nv\WORK\SCIA-ENGINEER\TESTING-PROJECTS\QuickTests\OpenAPIEmptyProject.esa")
+        proj = env.OpenProject("C:\OpenAPIEmptyProject.esa")'path to the empty project
         'If (proj = ) Then
         ' Return
         ' End If
