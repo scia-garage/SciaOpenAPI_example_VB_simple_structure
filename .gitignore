@@ -1,2 +1,7 @@
-OpenAPIExampleVBNet\bin\
-OpenAPIExampleVBNet\obj
+bin/
+obj/
+v15/
+*.sln
+*.suo
+*.bak
+*.user
