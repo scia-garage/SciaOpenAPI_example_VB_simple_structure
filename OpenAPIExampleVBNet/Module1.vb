@@ -1,19 +1,24 @@
-﻿Module Module1
+﻿Imports System.IO
+Imports SCIA.OpenAPI
+Imports SCIA.OpenAPI.StructureModelDefinition
+Imports SCIA.OpenAPI.Results
+Imports SCIA.OpenAPI.OpenAPIEnums
+Module Module1
 
     Sub Main()
-        Console.WriteLine($"Hello!")
-        Dim env As SCIA.OpenAPI.Environment
+        Dim env As Environment
 
-        env = New SCIA.OpenAPI.Environment("c:\Program Files (x86)\SCIA\Engineer19.0\", "C:Temp\SCIATemp", "1.0.0.0")
-
+        env = New Environment("C:\Program Files (x86)\SCIA\Engineer19.1\", "C:Temp\SCIATemp", "1.0.0.0")
         Dim openedSE As Boolean
-        openedSE = env.RunSCIAEngineer(SCIA.OpenAPI.Environment.GuiMode.ShowWindowShow)
+        openedSE = env.RunSCIAEngineer(Environment.GuiMode.ShowWindowShow)
         If (Not openedSE) Then
             Return
         End If
         Console.WriteLine($"SEn opened")
-        Dim proj As SCIA.OpenAPI.EsaProject
-        proj = env.OpenProject("C:\OpenAPIEmptyProject.esa")'path to the empty project
+        Dim CurDir As String = My.Application.Info.DirectoryPath
+        Dim pathTemplate As String = Path.Combine(CurDir, "..\..\..\..\res\OpenAPIEmptyProject.esa")
+        Dim proj As EsaProject
+        proj = env.OpenProject(pathTemplate) 'path to the empty project
         'If (proj = ) Then
         ' Return
         ' End If
@@ -21,28 +26,31 @@
 
         Dim comatid As Guid
         comatid = Guid.NewGuid()
-        proj.Model.CreateMaterial(New SCIA.OpenAPI.StructureModelDefinition.Material(comatid, "conc", 0, "C30/37"))
+        Console.WriteLine($"Concrete grade: ")
+        Dim conMatGrade As String
+        conMatGrade = Console.ReadLine()
+        proj.Model.CreateMaterial(New Material(comatid, "conc", 0, conMatGrade))
         Dim stmatid As Guid
         stmatid = Guid.NewGuid()
-        proj.Model.CreateMaterial(New SCIA.OpenAPI.StructureModelDefinition.Material(stmatid, "steel", 1, "S 355"))
-        Dim timatid As Guid
-        timatid = Guid.NewGuid()
-        proj.Model.CreateMaterial(New SCIA.OpenAPI.StructureModelDefinition.Material(timatid, "timber", 2, "D24 (EN 338)"))
-        Dim alumatid As Guid
-        alumatid = Guid.NewGuid()
-        proj.Model.CreateMaterial(New SCIA.OpenAPI.StructureModelDefinition.Material(alumatid, "alu", 3, "EN-AW 6005A (EP/O,ER/B) T6 (0-5)"))
-        Console.WriteLine($"Materials created in ADM")
-
-        proj.Model.CreateCrossSection(New SCIA.OpenAPI.StructureModelDefinition.CrossSectionParametric(Guid.NewGuid(), "conc.rect", comatid, 1, {0.2, 0.4}))
+        Console.WriteLine($"Steel grade: ")
+        Dim stMatGrade As String
+        stMatGrade = Console.ReadLine()
+        proj.Model.CreateMaterial(New Material(stmatid, "steel", 1, stMatGrade))
         Dim css_steel As Guid
         css_steel = Guid.NewGuid()
-        proj.Model.CreateCrossSection(New SCIA.OpenAPI.StructureModelDefinition.CrossSectionManufactured(css_steel, "steel.HEA", stmatid, "HEA260", 1, 0))
+        Console.WriteLine($"Steel profile: ")
+        Dim stCss As String
+        stCss = Console.ReadLine()
+        proj.Model.CreateCrossSection(New CrossSectionManufactured(css_steel, "steel.HEA", stmatid, stCss, 1, 0))
         Console.WriteLine($"CSSs created in ADM")
 
         Dim a, b, c As Double
-        a = 6
-        b = 8
-        c = 3
+        Console.WriteLine($"a: ")
+        a = Double.Parse(Console.ReadLine())
+        Console.WriteLine($"b: ")
+        b = Double.Parse(Console.ReadLine())
+        Console.WriteLine($"c: ")
+        c = Double.Parse(Console.ReadLine())
         Dim n1, n2, n3, n4, n5, n6, n7, n8 As Guid
         n1 = Guid.NewGuid()
         n2 = Guid.NewGuid()
@@ -52,58 +60,96 @@
         n6 = Guid.NewGuid()
         n7 = Guid.NewGuid()
         n8 = Guid.NewGuid()
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n1, "n1", 0, 0, 0))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n2, "n2", a, 0, 0))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n3, "n3", a, b, 0))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n4, "n4", 0, b, 0))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n5, "n5", 0, 0, c))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n6, "n6", a, 0, c))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n7, "n7", a, b, c))
-        proj.Model.CreateNode(New SCIA.OpenAPI.StructureModelDefinition.StructNode(n8, "n8", 0, b, c))
+        proj.Model.CreateNode(New StructNode(n1, "n1", 0, 0, 0))
+        proj.Model.CreateNode(New StructNode(n2, "n2", a, 0, 0))
+        proj.Model.CreateNode(New StructNode(n3, "n3", a, b, 0))
+        proj.Model.CreateNode(New StructNode(n4, "n4", 0, b, 0))
+        proj.Model.CreateNode(New StructNode(n5, "n5", 0, 0, c))
+        proj.Model.CreateNode(New StructNode(n6, "n6", a, 0, c))
+        proj.Model.CreateNode(New StructNode(n7, "n7", a, b, c))
+        proj.Model.CreateNode(New StructNode(n8, "n8", 0, b, c))
 
         Dim b1, b2, b3, b4 As Guid
         b1 = Guid.NewGuid()
         b2 = Guid.NewGuid()
         b3 = Guid.NewGuid()
         b4 = Guid.NewGuid()
-        proj.Model.CreateBeam(New SCIA.OpenAPI.StructureModelDefinition.Beam(b1, "b1", css_steel, {n1, n5}))
-        proj.Model.CreateBeam(New SCIA.OpenAPI.StructureModelDefinition.Beam(b2, "b2", css_steel, {n2, n6}))
-        proj.Model.CreateBeam(New SCIA.OpenAPI.StructureModelDefinition.Beam(b3, "b3", css_steel, {n3, n7}))
-        proj.Model.CreateBeam(New SCIA.OpenAPI.StructureModelDefinition.Beam(b4, "b4", css_steel, {n4, n8}))
+        proj.Model.CreateBeam(New Beam(b1, "b1", css_steel, {n1, n5}))
+        proj.Model.CreateBeam(New Beam(b2, "b2", css_steel, {n2, n6}))
+        proj.Model.CreateBeam(New Beam(b3, "b3", css_steel, {n3, n7}))
+        proj.Model.CreateBeam(New Beam(b4, "b4", css_steel, {n4, n8}))
 
-        proj.Model.CreatePointSupport(New SCIA.OpenAPI.StructureModelDefinition.PointSupport(Guid.NewGuid(), "Su1", n1))
-        proj.Model.CreatePointSupport(New SCIA.OpenAPI.StructureModelDefinition.PointSupport(Guid.NewGuid(), "Su2", n2))
-        proj.Model.CreatePointSupport(New SCIA.OpenAPI.StructureModelDefinition.PointSupport(Guid.NewGuid(), "Su3", n3))
-        proj.Model.CreatePointSupport(New SCIA.OpenAPI.StructureModelDefinition.PointSupport(Guid.NewGuid(), "Su4", n4))
+        Dim Su1 As PointSupport
+        Su1 = New PointSupport(Guid.NewGuid(), "Su1", n1) With {
+            .ConstraintRx = eConstraintType.Free,
+            .ConstraintRy = eConstraintType.Free,
+            .ConstraintRz = eConstraintType.Free
+        }
+        proj.Model.CreatePointSupport(Su1)
+        proj.Model.CreatePointSupport(New PointSupport(Guid.NewGuid(), "Su2", n2))
+        proj.Model.CreatePointSupport(New PointSupport(Guid.NewGuid(), "Su3", n3))
+        proj.Model.CreatePointSupport(New PointSupport(Guid.NewGuid(), "Su4", n4))
 
         Dim s1 As Guid
         s1 = Guid.NewGuid()
         Dim Nodes = New Guid() {n5, n6, n7, n8}
-        proj.Model.CreateSlab(New SCIA.OpenAPI.StructureModelDefinition.Slab(s1, "s1", 0, comatid, 0.15, Nodes))
+        Dim thickness As Double
+        Console.WriteLine($"thickness of slab: ")
+        thickness = Double.Parse(Console.ReadLine())
+        proj.Model.CreateSlab(New Slab(s1, "s1", 0, comatid, thickness, Nodes))
         Dim lg1 As Guid
         lg1 = Guid.NewGuid()
-        proj.Model.CreateLoadGroup(New SCIA.OpenAPI.StructureModelDefinition.LoadGroup(lg1, "lg1", 0))
+        proj.Model.CreateLoadGroup(New LoadGroup(lg1, "lg1", 0))
         Dim lc1 As Guid
         lc1 = Guid.NewGuid()
-        proj.Model.CreateLoadCase(New SCIA.OpenAPI.StructureModelDefinition.LoadCase(lc1, "lc1", 0, lg1, 1))
+        proj.Model.CreateLoadCase(New LoadCase(lc1, "lc1", 0, lg1, 1))
+        'Combination
+        Dim combinationItems As CombinationItem() = {New CombinationItem(lc1, 1.5)}
+        Dim C1 As Combination
+        C1 = New Combination(Guid.NewGuid(), "C1", combinationItems) With
+        {
+            .Category = eLoadCaseCombinationCategory.AccordingNationalStandard,
+            .NationalStandard = eLoadCaseCombinationStandard.EnUlsSetC
+        }
+        proj.Model.CreateCombination(C1)
+
         Dim sf1 As Guid
         sf1 = Guid.NewGuid()
-        proj.Model.CreateSurfaceLoad(New SCIA.OpenAPI.StructureModelDefinition.SurfaceLoad(sf1, "sf1", -12500, lc1, s1, 2))
-
+        Dim loadValue As Double
+        Console.WriteLine($"Value of surface load on slab: ")
+        loadValue = Double.Parse(Console.ReadLine())
+        proj.Model.CreateSurfaceLoad(New SurfaceLoad(sf1, "sf1", loadValue, lc1, s1, 2))
+        ' LINE SUPPORT
+        Dim lSupport As LineSupport
+        lSupport = New LineSupport(Guid.NewGuid(), "lineSupport", b1) With {
+            .Member = b1,
+            .ConstraintRx = eConstraintType.Free,
+            .ConstraintRy = eConstraintType.Free,
+            .ConstraintRz = eConstraintType.Free
+        }
+        proj.Model.CreateLineSupport(lSupport)
+        ' line load
+        Dim lload As LineLoadOnBeam
+        lload = New LineLoadOnBeam(Guid.NewGuid(), "lineLoad") With {
+            .Member = b1,
+            .LoadCase = lc1,
+            .Value1 = -12500,
+            .Value2 = -12500,
+            .Direction = eDirection.Z
+         }
+        proj.Model.CreateLineLoad(lload)
 
         proj.Model.RefreshModel_ToSCIAEngineer()
         Console.WriteLine($"My model sent to SEn")
 
 
-        'proj.CreateMesh() 'needs dialogue click
-
         proj.RunCalculation()
         Console.WriteLine($"My model calculate")
 
-        Dim rapi As SCIA.OpenAPI.Results.ResultsAPI
+        Dim rapi As ResultsAPI
         rapi = proj.Model.InitializeResultsAPI()
-        Dim IntFor1Db1 As SCIA.OpenAPI.Results.Result
-        Dim keyIntFor1Db1 As New SCIA.OpenAPI.Results.ResultKey With {
+        Dim IntFor1Db1 As Result
+        Dim keyIntFor1Db1 As New ResultKey With {
             .CaseType = Results64Enums.eDsElementType.eDsElementType_LoadCase,
             .CaseId = lc1,
             .EntityType = Results64Enums.eDsElementType.eDsElementType_Beam,
@@ -116,10 +162,28 @@
 
         IntFor1Db1 = rapi.LoadResult(keyIntFor1Db1)
         Console.WriteLine(IntFor1Db1.GetTextOutput())
+        Dim IntFor1Db1Combi As Result
+        'Results key for internal forces on beam 1 for combination
+        Dim keyIntFor1Db1Combi As New ResultKey With {
+             .EntityType = Results64Enums.eDsElementType.eDsElementType_Beam,
+            .EntityName = "b1",
+            .CaseType = Results64Enums.eDsElementType.eDsElementType_Combination,
+            .CaseId = C1.Id,
+            .Dimension = Results64Enums.eDimension.eDim_1D,
+            .ResultType = Results64Enums.eResultType.eFemBeamInnerForces,
+            .CoordSystem = Results64Enums.eCoordSystem.eCoordSys_Local
+         }
+        'Load 1D results based on results key
+        IntFor1Db1Combi = rapi.LoadResult(keyIntFor1Db1Combi)
+        'If (IntFor1Db1Combi!= null) Then
+
+        Console.WriteLine(IntFor1Db1Combi.GetTextOutput())
+        'End If
 
 
-        Dim Def2Ds1 As SCIA.OpenAPI.Results.Result
-        Dim keyDef2Ds1 = New SCIA.OpenAPI.Results.ResultKey With {
+
+        Dim Def2Ds1 As Result
+        Dim keyDef2Ds1 = New ResultKey With {
             .CaseType = Results64Enums.eDsElementType.eDsElementType_LoadCase,
             .CaseId = lc1,
             .EntityType = Results64Enums.eDsElementType.eDsElementType_Slab,
@@ -137,7 +201,7 @@
         pivot = maxvalue
         For i As Integer = 0 To Def2Ds1.GetMeshElementCount()
             pivot = Def2Ds1.GetValue(2, i)
-            If System.Math.Abs(pivot) > System.Math.Abs(maxvalue) Then
+            If Math.Abs(pivot) > Math.Abs(maxvalue) Then
                 maxvalue = pivot
             End If
         Next
@@ -150,7 +214,7 @@
         Console.WriteLine($"Press key to exit")
         Console.ReadKey()
 
-        proj.CloseProject(SCIA.OpenAPI.SaveMode.SaveChangesNo)
+        proj.CloseProject(SaveMode.SaveChangesNo)
     End Sub
 
 End Module
