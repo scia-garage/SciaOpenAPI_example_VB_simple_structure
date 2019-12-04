@@ -1,21 +1,53 @@
-﻿Imports System.IO
+﻿Imports System
+Imports System.IO
 Imports SCIA.OpenAPI
 Imports SCIA.OpenAPI.StructureModelDefinition
 Imports SCIA.OpenAPI.Results
 Imports SCIA.OpenAPI.OpenAPIEnums
+
 Module Module1
 
-    Sub Main()
-        Using env As New SCIA.OpenAPI.Environment("c:\Program Files (x86)\SCIA\Engineer19.0\", ".\SCIATemp", "1.0.0.0")
+    Private Function GetSEnPath()
+        Return "c:\WORK\SCIA-ENGINEER\TESTING-VERSIONS\Full_19.1.2010.32_rel_19.1_patch_2_x86\" ' SEn application installation folder, don't forget run "EP_regsvr32 esa.exe" from commandline with Admin rights
+    End Function
+
+    Private Function GetSEnTempPath()
+        Return "c:\WORK\SCIA-ENGINEER\TESTING-VERSIONS\Full_19.1.2010.32_rel_19.1_patch_2_x86\Temp\" ' Must be SEn application temp path, run SEn and go to menu: Setup -> Options -> Directories -> Temporary files
+    End Function
+
+    Private Function GetThisAppLogPath()
+        Return "c:\TEMP\OpenAPI\MyLogsTemp" ' Folder for storing of log files for this console application
+    End Function
+
+    Private Function GetSEnProjectFilePath()
+        Return "C:\WORK\SourceCodes\OpenAPIExampleVBNet\res\OpenAPIEmptyProject.esa" ' Project which will be used by SEn
+    End Function
+
+    Private Function ResolveAssemblies(sender As Object, e As System.ResolveEventArgs) As Reflection.Assembly
+        ' Function which is needed for coorect load of SEn assemblies, see the line "AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies"
+        Dim dllName = e.Name.Substring(0, e.Name.IndexOf(",")) + ".dll"
+        Dim dllFullPath = Path.Combine(GetSEnPath(), dllName)
+        If Not System.IO.File.Exists(dllFullPath) Then
+            dllFullPath = Path.Combine(GetSEnPath(), "OpenAPI_dll", dllName)
+            If Not System.IO.File.Exists(dllFullPath) Then
+                Return Nothing
+            End If
+        End If
+        Return Reflection.Assembly.LoadFrom(dllFullPath)
+    End Function
+
+    <STAThread()> Private Function CreateModel()
+        ' Standalone function where model is created and calculated, please note the "<STAThread()>" in declaration of the function
+        Using env As New SCIA.OpenAPI.Environment(GetSEnPath(), GetThisAppLogPath(), "1.0.0.0")
 
             Dim openedSE As Boolean
-            openedSE = env.RunSCIAEngineer(Environment.GuiMode.ShowWindowShow)
+            openedSE = env.RunSCIAEngineer(SCIA.OpenAPI.Environment.GuiMode.ShowWindowShow)
             If (Not openedSE) Then
-                Return
+                Return Nothing
             End If
             Console.WriteLine($"SEn opened")
             Dim CurDir As String = My.Application.Info.DirectoryPath
-            Dim pathTemplate As String = Path.Combine(CurDir, "..\..\..\..\res\OpenAPIEmptyProject.esa")
+            Dim pathTemplate As String = GetSEnProjectFilePath()
             Dim proj As EsaProject
             proj = env.OpenProject(pathTemplate) 'path to the empty project
             'If (proj = ) Then
@@ -215,6 +247,20 @@ Module Module1
 
             proj.CloseProject(SaveMode.SaveChangesNo)
         End Using
+        Return Nothing
+    End Function
+
+    ' Please note the "<STAThread()>" in declaration of the Sub Main
+    <STAThread()> Sub Main()
+        ' Function which is responsible for loading of all necessary assemblies used by SCIA.OpenAPI, must be first line in Main method
+        AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies
+
+        ' SEn temp folder must be empty before start of the app
+        If System.IO.Directory.Exists(GetSEnTempPath()) Then
+            System.IO.Directory.Delete(GetSEnTempPath(), True)
+        End If
+        ' Don't use SCIA.OpenAPI directly in Sub Main(), because it doesn't work together with AssemblyResolve in Sub Main
+        CreateModel()
     End Sub
 
 End Module
