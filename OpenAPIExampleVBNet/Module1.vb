@@ -8,11 +8,11 @@ Imports SCIA.OpenAPI.OpenAPIEnums
 Module Module1
 
     Private Function GetSEnPath()
-        Return "c:\WORK\SCIA-ENGINEER\TESTING-VERSIONS\Full_19.1.2010.32_rel_19.1_patch_2_x86\" ' SEn application installation folder, don't forget run "EP_regsvr32 esa.exe" from commandline with Admin rights
+        Return "C:\Program Files (x86)\SCIA\Engineer19.1\" ' SEn application installation folder, don't forget run "esa.exe /regserver" from commandline with Admin rights
     End Function
 
     Private Function GetSEnTempPath()
-        Return "c:\WORK\SCIA-ENGINEER\TESTING-VERSIONS\Full_19.1.2010.32_rel_19.1_patch_2_x86\Temp\" ' Must be SEn application temp path, run SEn and go to menu: Setup -> Options -> Directories -> Temporary files
+        Return "C:\Users\jbroz\ESA19.1\Temp\" ' Must be SEn application temp path, run SEn and go to menu: Setup -> Options -> Directories -> Temporary files
     End Function
 
     Private Function GetThisAppLogPath()
@@ -256,9 +256,9 @@ Module Module1
         AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies
 
         ' SEn temp folder must be empty before start of the app
-        If System.IO.Directory.Exists(GetSEnTempPath()) Then
-            System.IO.Directory.Delete(GetSEnTempPath(), True)
-        End If
+        'If System.IO.Directory.Exists(GetSEnTempPath()) Then
+        '    System.IO.Directory.Delete(GetSEnTempPath(), True)
+        'End If
         ' Don't use SCIA.OpenAPI directly in Sub Main(), because it doesn't work together with AssemblyResolve in Sub Main
         CreateModel()
     End Sub
