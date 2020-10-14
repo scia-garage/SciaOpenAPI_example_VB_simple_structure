@@ -1,15 +1,39 @@
+# Prerequisities
+- installed latest version of SCIA Engineer (19.1 patch 2)
+- installed MS Visual Studio https://visualstudio.microsoft.com/cs/vs/ Community edition is sufficient. You can also use Visual Studio Code https://code.visualstudio.com/
+
 # To start new VB.NET development project in MS Visual Studio to produce app that will use the Scia OpenAPI:
-- install SCIA Engineer (32/64bit)
-- start MS Visual Studio https://visualstudio.microsoft.com/cs/vs/
 - create empty VB.NET console app project using .NET 4.6.1
 - Add reference to SCIA.OpenAPI.dll located in Scia Engineer install folder, edit properties of reference and set Copy Local = False
 - Create new / use configuration for x86 / x64 as needed according to SCIA Engineer Architecture
+
 - Write your application that use the SCIA.OpenAPI functions
 - Don't forget to use "using" statement for environment object creation OR call the Environment's Dispose() method when you finish your work with SCIA OpenAPI
-- Copy following DLLs to your application output directory: SCIA.OpenAPI.dll, ESAAtl80Extern.dll
+- write method for resolving of assemblies - see sample 
+```vb.net
+Private Function ResolveAssemblies(sender As Object, e As System.ResolveEventArgs) As Reflection.Assembly
+        ' Function which is needed for coorect load of SEn assemblies, see the line "AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies"
+        Dim dllName = e.Name.Substring(0, e.Name.IndexOf(",")) + ".dll"
+        Dim dllFullPath = Path.Combine(GetSEnPath(), dllName)
+        If Not System.IO.File.Exists(dllFullPath) Then
+            dllFullPath = Path.Combine(GetSEnPath(), "OpenAPI_dll", dllName)
+            If Not System.IO.File.Exists(dllFullPath) Then
+                Return Nothing
+            End If
+        End If
+        Return Reflection.Assembly.LoadFrom(dllFullPath)
+End Function
+```
+- write method for deliting temp folder
+```vb.net
+If System.IO.Directory.Exists(GetSEnTempPath()) Then
+	System.IO.Directory.Delete(GetSEnTempPath(), True)
+End If
+```
+- Write your application that use the SCIA.OpenAPI functions
+- Methods using OpenAPI have to run in single thread appartment - use STAThread
 
 # To use this example application:
-- install SCIA Engineer (32/64bit)
 - clone this GIT repo
   - start command line
   - go to desired directory
