@@ -4,6 +4,7 @@ Imports SCIA.OpenAPI
 Imports SCIA.OpenAPI.StructureModelDefinition
 Imports SCIA.OpenAPI.Results
 Imports SCIA.OpenAPI.OpenAPIEnums
+Imports System.Diagnostics
 
 Module Module1
 
@@ -35,6 +36,27 @@ Module Module1
         End If
         Return Reflection.Assembly.LoadFrom(dllFullPath)
     End Function
+
+    Private Sub KillAllOrphanSCIAEngineerIntances()
+
+        For Each process As Process In Process.GetProcessesByName("EsaStartupScreen")
+            process.Kill()
+            Console.WriteLine($"Killed old EsaStartupScreen instance!")
+            System.Threading.Thread.Sleep(1000)
+        Next
+        For Each process As Process In Process.GetProcessesByName("Esa")
+            process.Kill()
+            Console.WriteLine($"Killed old EsaStartupScreen instance!")
+            System.Threading.Thread.Sleep(1000)
+        Next
+
+    End Sub
+    Private Sub DeleteTemp()
+        'SEn temp folder must be empty before start of the app
+        If System.IO.Directory.Exists(GetSEnTempPath()) Then
+            System.IO.Directory.Delete(GetSEnTempPath(), True)
+        End If
+    End Sub
 
     <STAThread()> Private Function CreateModel()
         ' Standalone function where model is created and calculated, please note the "<STAThread()>" in declaration of the function
@@ -252,15 +274,15 @@ Module Module1
 
     ' Please note the "<STAThread()>" in declaration of the Sub Main
     <STAThread()> Sub Main()
+
+        KillAllOrphanSCIAEngineerIntances()
         ' Function which is responsible for loading of all necessary assemblies used by SCIA.OpenAPI, must be first line in Main method
         AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies
 
-        'SEn temp folder must be empty before start of the app
-        If System.IO.Directory.Exists(GetSEnTempPath()) Then
-            System.IO.Directory.Delete(GetSEnTempPath(), True)
-        End If
+        DeleteTemp()
         ' Don't use SCIA.OpenAPI directly in Sub Main(), because it doesn't work together with AssemblyResolve in Sub Main
         CreateModel()
     End Sub
+
 
 End Module
