@@ -255,10 +255,10 @@ Module Module1
         ' Function which is responsible for loading of all necessary assemblies used by SCIA.OpenAPI, must be first line in Main method
         AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies
 
-        ' SEn temp folder must be empty before start of the app
-        'If System.IO.Directory.Exists(GetSEnTempPath()) Then
-        '    System.IO.Directory.Delete(GetSEnTempPath(), True)
-        'End If
+        'SEn temp folder must be empty before start of the app
+        If System.IO.Directory.Exists(GetSEnTempPath()) Then
+            System.IO.Directory.Delete(GetSEnTempPath(), True)
+        End If
         ' Don't use SCIA.OpenAPI directly in Sub Main(), because it doesn't work together with AssemblyResolve in Sub Main
         CreateModel()
     End Sub

@@ -34,7 +34,6 @@ End If
 - Methods using OpenAPI have to run in single thread appartment - use STAThread
 
 # To use this example application:
-- install SCIA Engineer (32/64bit)
 - clone this GIT repo
   - start command line
   - go to desired directory
