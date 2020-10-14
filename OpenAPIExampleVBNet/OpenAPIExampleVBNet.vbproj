@@ -72,9 +72,8 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SCIA.OpenAPI, Version=19.1.2029.64, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\SCIA\Engineer19.1\SCIA.OpenAPI.dll</HintPath>
+    <Reference Include="SCIA.OpenAPI">
+      <HintPath>..\..\..\..\Program Files (x86)\SCIA\Engineer19.1\OpenAPI_dll\SCIA.OpenAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
